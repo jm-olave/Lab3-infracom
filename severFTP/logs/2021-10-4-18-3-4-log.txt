@@ -1,0 +1,7 @@
+LOG 2021-10-04 18:03:04.462791
+
+Nombre del archivo: 100MB.txt
+Tamaño del archivo: 104857611 bytes
+Número de clientes: 0
+
+Información de clientes: 

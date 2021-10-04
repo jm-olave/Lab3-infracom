@@ -1,6 +1,7 @@
 import socket
 import os
 import threading
+import time
 from datetime import datetime
 import hashlib
 
@@ -11,11 +12,12 @@ SIZE = 1024
 FORMAT = "utf-8"
 SERVER_DATA_PATH = "server_data/"
 clients = []
+log = []
 BLOCK_SIZE = 4096
 
 
-def handle_client(conn, add, filename, number_clients):
-    print(f"[NEW CONNECTION] {add} conectado")
+def handle_client(conn, ip, port, filename, number_clients):
+    print(f"[NEW CONNECTION] {(ip, port)} conectado")
     conn.send("OK@Bienvenido al servidor".encode(FORMAT))
     x = True
     while x:
@@ -24,12 +26,18 @@ def handle_client(conn, add, filename, number_clients):
             hash_value = generateHash(filename)
             filesize = os.path.getsize(filename)
             conn.sendall(f'HASH:{hash_value}FILE:{filename}SIZE:{filesize}'.encode())
+            start_time = time.time()
             with open(f"{filename}", "r") as f:
                 file = f.read()
-
+            print("Is it alive")
             conn.send(file.encode(FORMAT))
+            finish_time = time.time()
+            tiempo = finish_time - start_time
+            log.append([ip, port, tiempo])
+            print(log)
+
             x = False
-    print(f"should be the end for thread")
+    print("should be the end for thread")
     conn.close()
 
 
@@ -49,30 +57,37 @@ def main():
     server.listen()
     print("The server is listening")
     while True:
-        conn, (ip, port) = server.accept()
-        clients.append([ip, port])
-        thread = threading.Thread(target=handle_client, args=(conn, (ip, port), filename,number_clients))
-        thread.start()
-        if len(clients) == number_clients:
-            writeLog(filename)
 
+        conn, (ip, port) = server.accept()
+        thread = threading.Thread(target=handle_client, args=(conn, ip, port, filename, number_clients))
+        thread.start()
+        clients.append([ip, port])
+        time.sleep(1)
+        if len(clients) == number_clients:
+            print("Writing Log")
+            writeLog(filename)
 
 
 def writeLog(filename):
     fecha = datetime.now()
     filesize = os.path.getsize(filename)
+    waitForThreads = True
+    while waitForThreads:
+        waitForThreads = len(log) != len(clients)
     log_name = f"{fecha.year}-{fecha.month}-{fecha.day}-{fecha.hour}-{fecha.minute}-{fecha.second}-log.txt"
     file_log = open(f"logs/{log_name}", "x")
+
 
     file_log.write(f"LOG {fecha}\n\n")
     file_log.write(f"Nombre del archivo: {filename.split('/')[1]}\n")
     file_log.write(f"Tamaño del archivo: {filesize} bytes\n")
-    file_log.write(f"Número de clientes: {len(clients)}\n\n")
+    file_log.write(f"Número de clientes: {len(log)}\n\n")
     file_log.write(f"Información de clientes: \n")
 
-    for data in clients:
+    for data in log:
         file_log.write(f"\tIP: {data[0]}\n")
         file_log.write(f"\tPUERTO: {data[1]}\n")
+        file_log.write(f"\tTIEMPO: {data[2] * 1000}\n")
         file_log.write(f"\n")
 
     file_log.close()

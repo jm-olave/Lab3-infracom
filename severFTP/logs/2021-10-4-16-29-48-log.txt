@@ -1,0 +1,13 @@
+LOG 2021-10-04 16:29:48.152234
+
+Nombre del archivo: 100MB.txt
+Tamaño del archivo: 104857611 bytes
+Número de clientes: 2
+
+Información de clientes: 
+	IP: 192.168.80.1
+	PUERTO: 52518
+
+	IP: 192.168.80.1
+	PUERTO: 52519
+
