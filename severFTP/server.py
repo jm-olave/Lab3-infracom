@@ -16,7 +16,7 @@ def handle_client(conn, add):
     while True:
         data = conn.recv(SIZE).decode(FORMAT)
         data = data.split("@")
-        data = data.split("@")
+
         cmd = data[0]
 
         if cmd == "LIST":
@@ -47,7 +47,7 @@ def handle_client(conn, add):
                 send_data += "El directorio del servidor esta vacio"
             else:
                 if filename in files:
-                    os.system(f"rm {SERVER_DATA_PATH}/{filename}")
+                    os.system(f"Del {SERVER_DATA_PATH}\{filename}")
                     send_data += "Archivo eliminado."
                 else:
                     send_data += "No se encontro el archivo."
