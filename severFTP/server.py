@@ -9,7 +9,7 @@ PORT = 4456
 ADDRESS = (IP, PORT)
 SIZE = 1024
 FORMAT = "utf-8"
-SERVER_DATA_PATH = "server_data"
+SERVER_DATA_PATH = "server_data/"
 clients = []
 BLOCK_SIZE = 4096
 
@@ -23,13 +23,13 @@ def handle_client(conn, add, filename, number_clients):
         if len(clients) == number_clients:
             hash_value = generateHash(filename)
             filesize = os.path.getsize(filename)
-            conn.sock.sendall(f'HASH:{hash_value}FILE:{filename}SIZE:{filesize}'.encode())
+            conn.sendall(f'HASH:{hash_value}FILE:{filename}SIZE:{filesize}'.encode())
             with open(f"{filename}", "r") as f:
                 file = f.read()
 
             conn.send(file.encode(FORMAT))
             x = False
-
+    print(f"should be the end for thread")
     conn.close()
 
 
@@ -38,7 +38,7 @@ def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("Que archivo desea utilizar:\n1. 100MB\n2. 250MB\n")
     archivo = int(input("Ingrese el número del archivo que desea enviar: "))
-    filename = "server_data/"
+    filename = SERVER_DATA_PATH
     if archivo == 1:
         filename += "100MB.txt"
     elif archivo == 2:
@@ -57,14 +57,15 @@ def main():
             writeLog(filename)
 
 
+
 def writeLog(filename):
     fecha = datetime.now()
     filesize = os.path.getsize(filename)
     log_name = f"{fecha.year}-{fecha.month}-{fecha.day}-{fecha.hour}-{fecha.minute}-{fecha.second}-log.txt"
-    file_log = open(f"servidor/Logs/{log_name}", "x")
+    file_log = open(f"logs/{log_name}", "x")
 
     file_log.write(f"LOG {fecha}\n\n")
-    file_log.write(f"Nombre del archivo: {filename.split('/')[2]}\n")
+    file_log.write(f"Nombre del archivo: {filename.split('/')[1]}\n")
     file_log.write(f"Tamaño del archivo: {filesize} bytes\n")
     file_log.write(f"Número de clientes: {len(clients)}\n\n")
     file_log.write(f"Información de clientes: \n")
