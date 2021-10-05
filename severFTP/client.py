@@ -26,7 +26,7 @@ def main():
     client.connect(ADDR)
     x=8
     print("antes del while")
-    while x < 10:
+    while x<10:
         bienvenida = client.recv(BLOCK_SIZE).decode(FORMAT)
         
         print(bienvenida)
@@ -37,6 +37,7 @@ def main():
     
         if len(data) > 0:
             info = data.split(":")
+            print(info)
             hash_val = info[1]
             print(hash_val +" hash")
             archivo = info[3]
@@ -46,12 +47,14 @@ def main():
             hash_compare = generateHash(archivo)
             print(hash_compare + "hash creado")
             if hash_val == hash_compare:
+                print( "Entra a compare")
                 client.send(f'Hash comparado exisosamente'.encode() )
             else:
-                print("Hash no comparado")
+                print("Entra a else")
+                client.send(f'Hash no comparado'.encode() )
 
         
-        x = x+1
+            x = x+2
         
 
 

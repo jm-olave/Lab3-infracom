@@ -23,18 +23,32 @@ def handle_client(conn, ip, port, filename, number_clients):
     while x:
 
         if len(clients) == number_clients:
+
             hash_value = generateHash(filename)
             filesize = os.path.getsize(filename)
-            conn.sendall(f'HASH:{hash_value}:FILE:{filename}:SIZE:{filesize}'.encode())
+            print("if check")
+            conn.send(f'HASH:{hash_value}:FILE:{filename}:SIZE:{filesize}'.encode())
+
             start_time = time.time()
             with open(f"{filename}", "r") as f:
                 file = f.read()
             print("Is it alive")
             conn.send(file.encode(FORMAT))
             finish_time = time.time()
+            hash_stat = None
+
+            data = conn.recv(BLOCK_SIZE)
+
+            if len(data) > 0:
+
+                hash_stat = data
+                conn.close()
+            else:
+                raise Exception("No se recibió la confirmación del hash del cliente:")
+
             tiempo = finish_time - start_time
-            log.append([ip, port, tiempo])
-            print(log)
+
+            log.append([ip, port, tiempo, hash_stat])
 
             x = False
     print("should be the end for thread")
@@ -77,7 +91,6 @@ def writeLog(filename):
     log_name = f"{fecha.year}-{fecha.month}-{fecha.day}-{fecha.hour}-{fecha.minute}-{fecha.second}-log.txt"
     file_log = open(f"logs/{log_name}", "x")
 
-
     file_log.write(f"LOG {fecha}\n\n")
     file_log.write(f"Nombre del archivo: {filename.split('/')[1]}\n")
     file_log.write(f"Tamaño del archivo: {filesize} bytes\n")
@@ -88,6 +101,7 @@ def writeLog(filename):
         file_log.write(f"\tIP: {data[0]}\n")
         file_log.write(f"\tPUERTO: {data[1]}\n")
         file_log.write(f"\tTIEMPO: {data[2] * 1000}\n")
+        file_log.write(f"\tHASH_STATUS: {data[3]}\n")
         file_log.write(f"\n")
 
     file_log.close()
