@@ -25,7 +25,7 @@ def handle_client(conn, ip, port, filename, number_clients):
         if len(clients) == number_clients:
             hash_value = generateHash(filename)
             filesize = os.path.getsize(filename)
-            conn.sendall(f'HASH:{hash_value}FILE:{filename}SIZE:{filesize}'.encode())
+            conn.sendall(f'HASH:{hash_value}:FILE:{filename}:SIZE:{filesize}'.encode())
             start_time = time.time()
             with open(f"{filename}", "r") as f:
                 file = f.read()

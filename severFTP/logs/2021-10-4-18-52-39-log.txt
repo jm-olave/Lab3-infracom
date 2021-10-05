@@ -1,0 +1,11 @@
+LOG 2021-10-04 18:52:39.861100
+
+Nombre del archivo: 100MB.txt
+Tamaño del archivo: 104857611 bytes
+Número de clientes: 1
+
+Información de clientes: 
+	IP: 192.168.7.228
+	PUERTO: 51226
+	TIEMPO: 407.3941707611084
+
